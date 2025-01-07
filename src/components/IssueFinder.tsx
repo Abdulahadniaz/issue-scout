@@ -12,8 +12,9 @@ export default function IssueFinder() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [owner, setOwner] = useState("");
-  const [repo, setRepo] = useState("");
+  const [ownerNameInput, setOwnerNameInput] = useState("");
+  const [repoNameInput, setRepoNameInput] = useState("");
+  const [selectedChip, setSelectedChip] = useState("url");
 
   const handleSubmit = async (
     e: React.FormEvent,
@@ -23,22 +24,24 @@ export default function IssueFinder() {
     setLoading(true);
     setError("");
 
+    let ownerParam, repoParam;
+
     if (submitType === "url") {
       const urlParts = repoUrl.split("github.com/")[1]?.split("/");
       if (!urlParts || urlParts.length < 2) {
         throw new Error("Invalid GitHub URL");
       }
       const [owner, repo] = urlParts;
-      setOwner(owner);
-      setRepo(repo);
+      ownerParam = owner;
+      repoParam = repo;
     } else if (submitType === "ownerRepoName") {
-      setOwner(owner);
-      setRepo(repo);
+      ownerParam = ownerNameInput;
+      repoParam = repoNameInput;
     }
 
     try {
       const response = await fetch(
-        `/api/issues/good-first-issues?owner=${owner}&repo=${repo}`
+        `/api/issues/good-first-issues?owner=${ownerParam}&repo=${repoParam}`
       );
       const data = await response.json();
 
@@ -68,50 +71,76 @@ export default function IssueFinder() {
             </div>
           ))}
         </div> */}
-        <form onSubmit={(e) => handleSubmit(e, "url")} className="space-y-4">
-          <input
-            type="text"
-            value={repoUrl}
-            onChange={(e) => setRepoUrl(e.target.value)}
-            placeholder="Enter GitHub repository URL"
-            className="w-full border border-gray-300 rounded-md p-2"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-500 text-white p-2 rounded-md"
+        <div className="flex justify-start gap-2 my-2">
+          <div
+            className={` cursor-pointer p-1 rounded-md ${
+              selectedChip === "url"
+                ? "bg-gray-200 text-gray-500"
+                : "bg-white-500 text-gray-500"
+            }`}
+            onClick={() => setSelectedChip("url")}
           >
-            {loading ? "Loading..." : "Find Issues"}
-          </button>
-        </form>
-        <form
-          onSubmit={(e) => handleSubmit(e, "ownerRepoName")}
-          className="space-y-4 mt-2"
-        >
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={owner}
-              onChange={(e) => setOwner(e.target.value)}
-              placeholder="Enter repo owner"
-              className="w-full border border-gray-300 rounded-md p-2"
-            />
-            <input
-              type="text"
-              value={repo}
-              onChange={(e) => setRepo(e.target.value)}
-              placeholder="Enter repo name"
-              className="w-full border border-gray-300 rounded-md p-2"
-            />
+            By URL
           </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-500 text-white p-2 rounded-md"
+          <div
+            onClick={() => setSelectedChip("ownerRepoName")}
+            className={` cursor-pointer p-1 rounded-md ${
+              selectedChip === "ownerRepoName"
+                ? "bg-gray-200 text-gray-500"
+                : "bg-white-500 text-gray-500"
+            }`}
           >
-            {loading ? "Loading..." : "Find Issues"}
-          </button>
-        </form>
+            By Name
+          </div>
+        </div>
+        {selectedChip === "url" && (
+          <form onSubmit={(e) => handleSubmit(e, "url")} className="space-y-4">
+            <input
+              type="text"
+              value={repoUrl}
+              onChange={(e) => setRepoUrl(e.target.value)}
+              placeholder="Enter GitHub repository URL"
+              className="w-full border border-gray-300 rounded-md p-2"
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-blue-500 text-white p-2 rounded-md"
+            >
+              {loading ? "Loading..." : "Find Issues"}
+            </button>
+          </form>
+        )}
+        {selectedChip === "ownerRepoName" && (
+          <form
+            onSubmit={(e) => handleSubmit(e, "ownerRepoName")}
+            className="space-y-4 mt-2"
+          >
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={ownerNameInput}
+                onChange={(e) => setOwnerNameInput(e.target.value)}
+                placeholder="Enter repo owner"
+                className="w-full border border-gray-300 rounded-md p-2"
+              />
+              <input
+                type="text"
+                value={repoNameInput}
+                onChange={(e) => setRepoNameInput(e.target.value)}
+                placeholder="Enter repo name"
+                className="w-full border border-gray-300 rounded-md p-2"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-blue-500 text-white p-2 rounded-md"
+            >
+              {loading ? "Loading..." : "Find Issues"}
+            </button>
+          </form>
+        )}
         {error && <div className="text-red-500 mt-4">{error}</div>}
       </div>
       <div className="border-l border-gray-200 mt-[-16px] mb-[-200px] "></div>
