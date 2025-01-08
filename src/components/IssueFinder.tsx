@@ -12,24 +12,31 @@ type Issue = {
 
 export default function IssueFinder() {
   const [repoUrl, setRepoUrl] = useState("");
-  const [issues, setIssues] = useState<Issue[]>([]);
+  const [manualSearchGFIs, setManualSearchGFIs] = useState<Issue[]>([]);
   const [formError, setFormError] = useState("");
   const [ownerNameInput, setOwnerNameInput] = useState("");
   const [repoNameInput, setRepoNameInput] = useState("");
   const [selectedChip, setSelectedChip] = useState("url");
-  const [randomIssues, setRandomIssues] = useState<Issue[]>([]);
+  const [topReposGFIs, setTopReposGFIs] = useState<Issue[]>([]);
+  const [searchTopReposActive, setSearchTopReposActive] = useState(true);
 
-  useEffect(() => {
-    fetchRandomGFI();
-  }, []);
-
-  const fetchRandomGFI = async () => {
+  const fetchTopReposGFIs = async () => {
     const response = await fetch("/api/issues/random-gfis");
     const data = await response.json();
-    setRandomIssues(data);
+    return data;
   };
 
-  const { data, refetch, error, isRefetching } = useQuery({
+  const { data: topReposGFIsData, isLoading: topReposGFIsLoading } = useQuery({
+    queryKey: ["top_repos_gfis"],
+    queryFn: fetchTopReposGFIs,
+  });
+
+  const {
+    data: manualSearchGFIsData,
+    refetch,
+    error,
+    isRefetching,
+  } = useQuery({
     refetchOnWindowFocus: false,
     enabled: false,
     queryKey: ["gfi_of_repo"],
@@ -67,15 +74,24 @@ export default function IssueFinder() {
   }, [error]);
 
   useEffect(() => {
-    if (data) {
-      setIssues(data);
+    if (manualSearchGFIsData) {
+      setManualSearchGFIs(manualSearchGFIsData);
     }
-  }, [data]);
+    if (topReposGFIsData) {
+      setTopReposGFIs(topReposGFIsData);
+    }
+  }, [manualSearchGFIsData, topReposGFIsData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
+    setSearchTopReposActive(false);
     refetch();
+  };
+
+  const handleTopReposClick = async () => {
+    setSearchTopReposActive(!searchTopReposActive);
+    fetchTopReposGFIs();
   };
 
   return (
@@ -85,13 +101,6 @@ export default function IssueFinder() {
           Find a &apos;good first issue&apos; and start contributing to open
           source
         </h5>
-        {/* <div className="grid grid-cols-3 gap-1 my-2 ">
-          {languages.map((language) => (
-            <div key={language} className="bg-gray-200 p-1 rounded-md">
-              {language}
-            </div>
-          ))}
-        </div> */}
         <div className="flex justify-start gap-2 my-2">
           <div
             className={` cursor-pointer p-1 rounded-md ${
@@ -163,61 +172,81 @@ export default function IssueFinder() {
       </div>
       <div className="border-l border-gray-200 mt-[-16px] mb-[-200px] "></div>
       <div className="w-2/3 h-full overflow-y-auto">
-        <div className="p-6">
-          {issues.length > 0 ? (
-            <div className="space-y-4">
-              {issues.map((issue: Issue) => (
-                <div
-                  key={issue.id}
-                  className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"
-                >
-                  <a
-                    href={issue.html_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline font-medium"
-                  >
-                    {issue.title}
-                  </a>
-                  <p className="text-gray-600 mt-1 text-[12px]">
-                    {issue.body?.slice(0, 130)}...
-                  </p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className=" text-gray-500">
-              {randomIssues.length > 0 ? (
-                <div className="space-y-4">
-                  <h5 className="font-bold mb-4">
-                    Following are the good first issues from the top 100 repos
-                  </h5>
-                  {randomIssues.map((issue: Issue, index: number) => (
-                    <div
-                      key={index}
-                      className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"
-                    >
-                      <a
-                        href={issue.html_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline font-medium"
-                      >
-                        {issue.title}
-                      </a>
-                      <p className="text-gray-600 mt-1 text-[12px]">
-                        {issue.body?.slice(0, 130)}...
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div>Loading...</div>
-              )}
-            </div>
-          )}
+        <div className="flex justify-between items-center px-6">
+          <h2 className="text-xl font-bold text-left ">
+            Start searching for issues to see results
+          </h2>
+          <div
+            onClick={() => handleTopReposClick()}
+            className={`bg-gray-200 text-gray-500 p-1 rounded-md text-xs  cursor-pointer disabled:bg-gray-300 disabled:text-gray-500 ${
+              searchTopReposActive ? "bg-gray-500 text-white" : ""
+            }`}
+          >
+            Top 100 Repos
+          </div>
         </div>
+        {!searchTopReposActive && (
+          <div className="p-6">
+            {manualSearchGFIs.length > 0 && (
+              <div className="space-y-4">
+                <h5 className="font-bold mb-4">
+                  Following are the good first issues from your search
+                </h5>
+                {manualSearchGFIs.map((issue: Issue) => (
+                  <div
+                    key={issue.id}
+                    className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"
+                  >
+                    <a
+                      href={issue.html_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline font-medium"
+                    >
+                      {issue.title}
+                    </a>
+                    <p className="text-gray-600 mt-1 text-[12px]">
+                      {issue.body?.slice(0, 130)}...
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        {searchTopReposActive && (
+          <div className="p-6">
+            {topReposGFIs.length > 0 && !topReposGFIsLoading ? (
+              <div className="space-y-4">
+                <h5 className="font-bold mb-4">
+                  Following are the good first issues from the top 100 repos
+                </h5>
+                {topReposGFIs.map((issue: Issue, index: number) => (
+                  <div
+                    key={index}
+                    className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"
+                  >
+                    <a
+                      href={issue.html_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline font-medium"
+                    >
+                      {issue.title}
+                    </a>
+                    <p className="text-gray-600 mt-1 text-[12px]">
+                      {issue.body?.slice(0, 130)}...
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div>Loading...</div>
+            )}
+          </div>
+        )}
       </div>
+      <div className="border-r border-gray-200 mt-[-16px] mb-[-200px] "></div>
     </div>
   );
 }

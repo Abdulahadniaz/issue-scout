@@ -20,7 +20,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return { ownerName, repoName };
     })
 
-    // get good first issues for each repo with help of promise.all
     const gfis = await Promise.all(ownerAndRepos.map(async (repo) => {
         const response = await octokit.request('GET /repos/{owner}/{repo}/issues?labels=good+first+issue&state=open', {
             owner: repo.ownerName,
@@ -32,10 +31,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return response.data
     }))
 
-    // gfis is an array of arrays, so loop through each array and push all the issues into a new array
     const flattenedGfis = []
     for (const gfi of gfis) {
         flattenedGfis.push(...gfi)
+    }
+
+    if (flattenedGfis.length === 0) {
+        return res.status(200).json([])
     }
 
     return res.status(200).json(flattenedGfis)
