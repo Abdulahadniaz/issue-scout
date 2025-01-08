@@ -17,6 +17,17 @@ export default function IssueFinder() {
   const [ownerNameInput, setOwnerNameInput] = useState("");
   const [repoNameInput, setRepoNameInput] = useState("");
   const [selectedChip, setSelectedChip] = useState("url");
+  const [randomIssues, setRandomIssues] = useState<Issue[]>([]);
+
+  useEffect(() => {
+    fetchRandomGFI();
+  }, []);
+
+  const fetchRandomGFI = async () => {
+    const response = await fetch("/api/issues/random-gfis");
+    const data = await response.json();
+    setRandomIssues(data);
+  };
 
   const { data, refetch, error, isRefetching } = useQuery({
     refetchOnWindowFocus: false,
@@ -68,7 +79,7 @@ export default function IssueFinder() {
   };
 
   return (
-    <div className="h-screen flex max-w-6xl justify-center mx-auto">
+    <div className="h-[calc(100vh-100px)] flex max-w-6xl justify-center mx-auto">
       <div className="w-1/3 p-6">
         <h5 className="font-bold mb-4">
           Find a &apos;good first issue&apos; and start contributing to open
@@ -175,8 +186,34 @@ export default function IssueFinder() {
               ))}
             </div>
           ) : (
-            <div className="text-center text-gray-500">
-              No issues found. Enter a GitHub repository URL to get started.
+            <div className=" text-gray-500">
+              {randomIssues.length > 0 ? (
+                <div className="space-y-4">
+                  <h5 className="font-bold mb-4">
+                    Following are the good first issues from the top 100 repos
+                  </h5>
+                  {randomIssues.map((issue: Issue, index: number) => (
+                    <div
+                      key={index}
+                      className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"
+                    >
+                      <a
+                        href={issue.html_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline font-medium"
+                      >
+                        {issue.title}
+                      </a>
+                      <p className="text-gray-600 mt-1 text-[12px]">
+                        {issue.body?.slice(0, 130)}...
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div>Loading...</div>
+              )}
             </div>
           )}
         </div>
@@ -184,19 +221,3 @@ export default function IssueFinder() {
     </div>
   );
 }
-
-// const languages = [
-//   // most popular languages
-//   "JavaScript",
-//   "TypeScript",
-//   "Python",
-//   "Java",
-//   "C#",
-//   "Go",
-//   "C++",
-//   "Ruby",
-//   "PHP",
-//   "Swift",
-//   "Kotlin",
-//   "Rust",
-// ];

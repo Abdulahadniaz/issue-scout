@@ -1,7 +1,9 @@
 import { Octokit } from '@octokit/rest';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-const octokit = new Octokit()
+const octokit = new Octokit({
+    auth: process.env.GITHUB_TOKEN
+})
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'GET') {
