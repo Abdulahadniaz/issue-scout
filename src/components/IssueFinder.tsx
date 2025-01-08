@@ -1,4 +1,7 @@
-import { useState } from "react";
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
 type Issue = {
   id: number;
@@ -10,36 +13,29 @@ type Issue = {
 export default function IssueFinder() {
   const [repoUrl, setRepoUrl] = useState("");
   const [issues, setIssues] = useState<Issue[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [formError, setFormError] = useState("");
   const [ownerNameInput, setOwnerNameInput] = useState("");
   const [repoNameInput, setRepoNameInput] = useState("");
   const [selectedChip, setSelectedChip] = useState("url");
 
-  const handleSubmit = async (
-    e: React.FormEvent,
-    submitType: "url" | "ownerRepoName"
-  ) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    let ownerParam, repoParam;
-
-    if (submitType === "url") {
-      const urlParts = repoUrl.split("github.com/")[1]?.split("/");
-      if (!urlParts || urlParts.length < 2) {
-        throw new Error("Invalid GitHub URL");
+  const { data, refetch, error, isRefetching } = useQuery({
+    refetchOnWindowFocus: false,
+    enabled: false,
+    queryKey: ["gfi_of_repo"],
+    queryFn: async () => {
+      let ownerParam, repoParam;
+      if (selectedChip === "url") {
+        const urlParts = repoUrl.split("github.com/")[1]?.split("/");
+        if (!urlParts || urlParts.length < 2)
+          throw new Error("Invalid GitHub URL");
+        const [owner, repo] = urlParts;
+        ownerParam = owner;
+        repoParam = repo;
+      } else {
+        ownerParam = ownerNameInput;
+        repoParam = repoNameInput;
       }
-      const [owner, repo] = urlParts;
-      ownerParam = owner;
-      repoParam = repo;
-    } else if (submitType === "ownerRepoName") {
-      ownerParam = ownerNameInput;
-      repoParam = repoNameInput;
-    }
 
-    try {
       const response = await fetch(
         `/api/issues/good-first-issues?owner=${ownerParam}&repo=${repoParam}`
       );
@@ -47,14 +43,28 @@ export default function IssueFinder() {
 
       if (!response.ok)
         throw new Error(data.message || "Failed to fetch issues");
-      setIssues(data);
-    } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : "An unknown error occurred"
+      return data;
+    },
+  });
+
+  useEffect(() => {
+    if (error) {
+      setFormError(
+        error instanceof Error ? error.message : "An unknown error occurred"
       );
-    } finally {
-      setLoading(false);
     }
+  }, [error]);
+
+  useEffect(() => {
+    if (data) {
+      setIssues(data);
+    }
+  }, [data]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError("");
+    refetch();
   };
 
   return (
@@ -94,7 +104,7 @@ export default function IssueFinder() {
           </div>
         </div>
         {selectedChip === "url" && (
-          <form onSubmit={(e) => handleSubmit(e, "url")} className="space-y-4">
+          <form onSubmit={(e) => handleSubmit(e)} className="space-y-4">
             <input
               type="text"
               value={repoUrl}
@@ -104,18 +114,15 @@ export default function IssueFinder() {
             />
             <button
               type="submit"
-              disabled={loading}
-              className="w-full bg-blue-500 text-white p-2 rounded-md"
+              className="w-full bg-blue-500 text-white p-2 rounded-md disabled:bg-gray-300 disabled:text-gray-500"
+              disabled={isRefetching}
             >
-              {loading ? "Loading..." : "Find Issues"}
+              Find Issues
             </button>
           </form>
         )}
         {selectedChip === "ownerRepoName" && (
-          <form
-            onSubmit={(e) => handleSubmit(e, "ownerRepoName")}
-            className="space-y-4 mt-2"
-          >
+          <form onSubmit={(e) => handleSubmit(e)} className="space-y-4 mt-2">
             <div className="flex gap-2">
               <input
                 type="text"
@@ -134,14 +141,14 @@ export default function IssueFinder() {
             </div>
             <button
               type="submit"
-              disabled={loading}
-              className="w-full bg-blue-500 text-white p-2 rounded-md"
+              className="w-full bg-blue-500 text-white p-2 rounded-md disabled:bg-gray-300 disabled:text-gray-500"
+              disabled={isRefetching}
             >
-              {loading ? "Loading..." : "Find Issues"}
+              Find Issues
             </button>
           </form>
         )}
-        {error && <div className="text-red-500 mt-4">{error}</div>}
+        {formError && <div className="text-red-500 mt-4">{formError}</div>}
       </div>
       <div className="border-l border-gray-200 mt-[-16px] mb-[-200px] "></div>
       <div className="w-2/3 h-full overflow-y-auto">
