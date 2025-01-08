@@ -21,7 +21,7 @@ export default function IssueFinder() {
   const [searchTopReposActive, setSearchTopReposActive] = useState(true);
 
   const fetchTopReposGFIs = async () => {
-    const response = await fetch("/api/issues/random-gfis");
+    const response = await fetch("/api/issues/top-repos-gfis");
     const data = await response.json();
     return data;
   };
