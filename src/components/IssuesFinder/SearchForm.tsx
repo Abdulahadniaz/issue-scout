@@ -1,4 +1,6 @@
 import { SearchMethod } from "@/types/github";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 
 interface SearchFormProps {
   selectedMethod: SearchMethod;
@@ -44,23 +46,23 @@ export function SearchForm({
 
       <form onSubmit={onSubmit} className="space-y-4">
         {selectedMethod === "url" ? (
-          <input
+          <Input
             type="text"
             value={urlProps.value}
             onChange={urlProps.onChange}
             placeholder="Enter GitHub repository URL"
-            className="w-full border border-gray-300 rounded-md p-2"
+            className="w-full border  rounded-md p-2"
           />
         ) : (
           <div className="flex gap-2">
-            <input
+            <Input
               type="text"
               value={ownerRepoProps.owner}
               onChange={ownerRepoProps.onOwnerChange}
               placeholder="Enter repo owner"
               className="w-full border border-gray-300 rounded-md p-2"
             />
-            <input
+            <Input
               type="text"
               value={ownerRepoProps.repo}
               onChange={ownerRepoProps.onRepoChange}
@@ -69,13 +71,13 @@ export function SearchForm({
             />
           </div>
         )}
-        <button
+        <Button
           type="submit"
-          className="w-full bg-blue-500 text-white p-2 rounded-md disabled:bg-gray-300 disabled:text-gray-500"
+          className="disabled:bg-gray-300 disabled:text-gray-500"
           disabled={isLoading}
         >
           Find Issues
-        </button>
+        </Button>
       </form>
 
       {formError && <div className="text-red-500 mt-4">{formError}</div>}
