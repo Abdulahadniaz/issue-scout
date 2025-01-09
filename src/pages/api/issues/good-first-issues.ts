@@ -17,7 +17,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-        // issue which are open and have the label good first issue
         const response = await octokit.request('GET /repos/{owner}/{repo}/issues?labels=good+first+issue&state=open', {
             owner: owner as string,
             repo: repo as string,
@@ -27,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
 
         if (!response.data) {
-            throw new Error('Failed to fetch from GitHub API');
+            throw new Error('Could not fetch issues');
         }
 
         return res.status(200).json(response.data);

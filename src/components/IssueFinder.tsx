@@ -27,6 +27,7 @@ export default function IssueFinder() {
     const data = await response.json();
 
     if (!response.ok) {
+      setFormError(data.message || "Failed to fetch issues");
       throw new Error(data.message || "Failed to fetch issues");
     }
     return data;
@@ -34,7 +35,14 @@ export default function IssueFinder() {
 
   const topReposGFIs = async () => {
     const response = await fetch("/api/issues/top-repos-gfis");
-    return response.json();
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.log(data.message);
+      setFormError(data.message || "Failed to fetch issues");
+      throw new Error(data.message || "Failed to fetch issues");
+    }
+    return data;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
