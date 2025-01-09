@@ -53,6 +53,7 @@ export default function IssueFinder() {
     data: searchResults,
     refetch: searchIssues,
     isRefetching: isSearching,
+    isLoading: isManualSearchLoading,
   } = useQuery({
     queryKey: ["gfi_of_repo"],
     queryFn: gfiOfARepo,
@@ -95,6 +96,7 @@ export default function IssueFinder() {
         topReposIssues={topReposIssues}
         isTopReposLoading={isTopReposLoading}
         searchResults={searchResults}
+        isSearching={isSearching || isManualSearchLoading}
       />
 
       <div className="border-r border-gray-200 mt-[-16px] mb-[-200px]" />

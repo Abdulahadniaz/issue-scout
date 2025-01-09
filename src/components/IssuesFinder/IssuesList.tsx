@@ -7,12 +7,14 @@ export default function IssuesList({
   topReposIssues,
   isTopReposLoading,
   searchResults,
+  isSearching,
 }: {
   isTopReposActive: boolean;
   onToggleTopRepos: () => void;
   topReposIssues?: GitHubIssue[];
   isTopReposLoading: boolean;
   searchResults?: GitHubIssue[];
+  isSearching: boolean;
 }) {
   return (
     <div className="w-2/3 h-full overflow-y-auto">
@@ -39,6 +41,8 @@ export default function IssuesList({
               title="Following are the good first issues from the top 100 repos"
             />
           )
+        ) : isSearching ? (
+          <div>Searching...</div>
         ) : (
           <IssuesGrid
             issues={searchResults}
