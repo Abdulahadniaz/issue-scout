@@ -18,7 +18,7 @@ export function IssueCard({ issue }: IssueCardProps) {
           rel="noopener noreferrer"
           className="text-blue-600 hover:underline text-[14px]"
         >
-          {issue.title.slice(0, 100)}...
+          {issue.title.slice(0, 100) + (issue.title.length > 100 ? "..." : "")}
         </a>
         <a
           href={`https://github.com/${org}/${repo}`}
@@ -30,7 +30,7 @@ export function IssueCard({ issue }: IssueCardProps) {
         </a>
       </div>
       <p className="text-gray-600 mt-1 text-[12px]">
-        {issue.body?.slice(0, 120)}...
+        {issue.body?.slice(0, 120) + (issue.body?.length > 120 ? "..." : "")}
       </p>
     </div>
   );
