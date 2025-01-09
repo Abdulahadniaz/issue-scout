@@ -13,7 +13,7 @@ export default function IssueFinder() {
   const [ownerName, setOwnerName] = useState("");
   const [repoName, setRepoName] = useState("");
   const [formError, setFormError] = useState("");
-  const [isTopReposActive, setIsTopReposActive] = useState(true);
+  const [isTopReposActive, setIsTopReposActive] = useState(false);
 
   const gfiOfARepo = async () => {
     const params =
