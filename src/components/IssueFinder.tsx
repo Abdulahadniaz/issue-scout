@@ -9,12 +9,7 @@ import { getParamsFromUrl } from "@/lib/utils";
 
 const defaultUrl = "https://github.com/facebook/react";
 
-interface IssueFinderProps {
-  type: "repo" | "org";
-}
-
-export default function IssueFinder({ type }: IssueFinderProps) {
-  console.log(type);
+export default function IssueFinder() {
   const [searchMethod, setSearchMethod] = useState<SearchMethod>("url");
   const [repoUrl, setRepoUrl] = useState(defaultUrl);
   const [ownerName, setOwnerName] = useState("");

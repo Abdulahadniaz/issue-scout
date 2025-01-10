@@ -25,6 +25,10 @@ export default function Header() {
 
 const links = [
   {
+    text: "all",
+    href: "/all-issues",
+  },
+  {
     text: "repos",
     href: "/",
   },

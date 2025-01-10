@@ -14,7 +14,14 @@ export function IssuesGrid({
     <div className="space-y-4">
       <h5 className="font-bold mb-4">{title}</h5>
       {issues.map((issue) => (
-        <IssueCard key={issue.id} issue={issue} />
+        <IssueCard
+          key={issue.url}
+          title={issue.title}
+          body={issue.body}
+          url={issue.url}
+          repoUrl={issue.repoUrl}
+          stars={issue.stars}
+        />
       ))}
     </div>
   );

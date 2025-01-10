@@ -1,8 +1,9 @@
 export interface GitHubIssue {
-    id: number;
     title: string;
     body: string;
-    html_url: string;
+    url: string;
+    repoUrl?: string;
+    stars?: number; html_url: string;
 }
 
 export type SearchMethod = 'url' | 'ownerRepoName'; 

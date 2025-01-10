@@ -12,7 +12,7 @@ export default function Home() {
       <div className="h-screen p-4 overflow-hidden">
         <main className="">
           <Header />
-          <IssueFinder type="repo" />
+          <IssueFinder />
         </main>
       </div>
     </QueryClientProvider>
