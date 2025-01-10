@@ -1,15 +1,22 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SearchForm } from "./IssuesFinder/SearchForm";
 import IssuesList from "./IssuesFinder/IssuesList";
 import { SearchMethod } from "@/types/github";
 import { getParamsFromUrl } from "@/lib/utils";
 
-export default function IssueFinder() {
+const defaultUrl = "https://github.com/facebook/react";
+
+interface IssueFinderProps {
+  type: "repo" | "org";
+}
+
+export default function IssueFinder({ type }: IssueFinderProps) {
+  console.log(type);
   const [searchMethod, setSearchMethod] = useState<SearchMethod>("url");
-  const [repoUrl, setRepoUrl] = useState("");
+  const [repoUrl, setRepoUrl] = useState(defaultUrl);
   const [ownerName, setOwnerName] = useState("");
   const [repoName, setRepoName] = useState("");
   const [formError, setFormError] = useState("");
@@ -68,6 +75,10 @@ export default function IssueFinder() {
     enabled: false,
     retry: false,
   });
+
+  useEffect(() => {
+    searchIssues();
+  }, [searchIssues]);
 
   return (
     <div className="h-[calc(100vh-100px)] flex max-w-6xl justify-center mx-auto">
