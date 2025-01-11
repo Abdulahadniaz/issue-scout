@@ -23,27 +23,29 @@ export function IssueCard({
   return (
     <QueryClientProvider client={queryClient}>
       <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
           <a
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:underline text-[14px]"
+            className="text-blue-600 hover:underline text-sm sm:text-[14px] line-clamp-2 sm:line-clamp-1"
           >
-            {title.slice(0, 80) + (title.length > 80 ? "..." : "")}
+            {title}
           </a>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <a
               href={repoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-600 text-[12px] underline"
+              className="text-gray-600 text-xs sm:text-[12px] underline"
             >
               {repo.slice(0, 15) + (repo.length > 15 ? "..." : "")}
             </a>
             {stars && (
-              <div className="flex items-center justify-between gap-1">
-                <span className="text-gray-600 text-[12px]">{stars}</span>
+              <div className="flex items-center gap-1 shrink-0">
+                <span className="text-gray-600 text-xs sm:text-[12px]">
+                  {stars}
+                </span>
                 <Image
                   src="/github-mark.svg"
                   alt="GitHub"
@@ -54,8 +56,8 @@ export function IssueCard({
             )}
           </div>
         </div>
-        <p className="text-gray-600 mt-1 text-[12px]">
-          {body?.slice(0, 100) + (body?.length > 100 ? "..." : "")}
+        <p className="text-gray-600 mt-2 text-xs sm:text-[12px] line-clamp-3 sm:line-clamp-2">
+          {body}
         </p>
       </div>
     </QueryClientProvider>
