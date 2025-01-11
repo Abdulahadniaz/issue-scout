@@ -18,7 +18,7 @@ export function IssueCard({
   repoUrl,
   stars,
 }: IssueCardProps) {
-  const repo = repoUrl?.split("/")?.[4] ?? "unknown";
+  const repo = repoUrl ?? "unknown";
 
   return (
     <QueryClientProvider client={queryClient}>
