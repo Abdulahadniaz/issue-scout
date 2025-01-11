@@ -76,7 +76,7 @@ export default function IssueFinder() {
   }, [searchIssues]);
 
   return (
-    <div className="min-h-[calc(100vh-100px)] flex flex-col lg:flex-row max-w-6xl mx-auto">
+    <div className="h-[calc(100vh-100px)] flex flex-col lg:flex-row max-w-6xl mx-auto">
       <div className="w-full lg:w-1/3 p-6">
         <h5 className="font-bold mb-4">
           Find a &apos;good first issue&apos; and start contributing to open
