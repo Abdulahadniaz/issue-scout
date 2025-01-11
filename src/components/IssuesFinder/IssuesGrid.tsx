@@ -20,7 +20,7 @@ export function IssuesGrid({
           body={issue.body}
           url={issue.url}
           repoUrl={issue.url.split("/")[4]}
-          // stars={issue.stars}
+          stars={issue.stars}
         />
       ))}
     </div>
