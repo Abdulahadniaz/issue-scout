@@ -76,8 +76,8 @@ export default function IssueFinder() {
   }, [searchIssues]);
 
   return (
-    <div className="h-[calc(100vh-100px)] flex max-w-6xl justify-center mx-auto">
-      <div className="w-1/3 p-6">
+    <div className="min-h-[calc(100vh-100px)] flex flex-col lg:flex-row max-w-6xl mx-auto">
+      <div className="w-full lg:w-1/3 p-6">
         <h5 className="font-bold mb-4">
           Find a &apos;good first issue&apos; and start contributing to open
           source
@@ -102,7 +102,7 @@ export default function IssueFinder() {
         />
       </div>
 
-      <div className="border-l border-gray-200 mt-[-16px] mb-[-200px]" />
+      <div className="hidden lg:block border-l border-gray-200 mt-[-16px] mb-[-200px]" />
 
       <IssuesList
         isTopReposActive={isTopReposActive}
@@ -113,7 +113,7 @@ export default function IssueFinder() {
         isSearching={isSearching || isManualSearchLoading}
       />
 
-      <div className="border-r border-gray-200 mt-[-16px] mb-[-200px]" />
+      <div className="hidden lg:block border-r border-gray-200 mt-[-16px] mb-[-200px]" />
     </div>
   );
 }

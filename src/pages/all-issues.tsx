@@ -46,6 +46,58 @@ function PaginationButton({
   );
 }
 
+function PaginationControls({
+  page,
+  totalPages,
+  handlePrevPage,
+  handleNextPage,
+  jumpToPage,
+  setJumpToPage,
+  handleJumpToPage,
+}: {
+  page: number;
+  totalPages: number;
+  handlePrevPage: () => void;
+  handleNextPage: () => void;
+  jumpToPage: string;
+  setJumpToPage: (value: string) => void;
+  handleJumpToPage: (e: React.FormEvent) => void;
+}) {
+  return (
+    <div className="flex items-center justify-center gap-4 my-4">
+      <PaginationButton onClick={handlePrevPage} disabled={page === 1}>
+        Previous
+      </PaginationButton>
+
+      <span className="text-gray-600 text-[14px]">
+        Page {page} of {totalPages}
+      </span>
+
+      <form onSubmit={handleJumpToPage} className="flex items-center gap-2">
+        <input
+          type="number"
+          min="1"
+          max={totalPages}
+          value={jumpToPage}
+          onChange={(e) => setJumpToPage(e.target.value)}
+          className="w-16 px-2 py-1 border rounded-md text-[14px]"
+          placeholder="Page"
+        />
+        <button
+          type="submit"
+          className="px-2 py-1 border rounded-md text-[14px] bg-white hover:bg-gray-50 text-gray-700"
+        >
+          Go
+        </button>
+      </form>
+
+      <PaginationButton onClick={handleNextPage} disabled={page === totalPages}>
+        Next
+      </PaginationButton>
+    </div>
+  );
+}
+
 function IssuesContent() {
   const [page, setPage] = useState(1);
   const [jumpToPage, setJumpToPage] = useState("");
@@ -122,55 +174,39 @@ function IssuesContent() {
           <div>Loading...</div>
         ) : (
           <>
+            <div className="md:hidden">
+              <PaginationControls
+                page={page}
+                totalPages={totalPages}
+                handlePrevPage={handlePrevPage}
+                handleNextPage={handleNextPage}
+                jumpToPage={jumpToPage}
+                setJumpToPage={setJumpToPage}
+                handleJumpToPage={handleJumpToPage}
+              />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {data?.issues?.map((issue) => (
                 <IssueCard
                   key={issue.id}
-                  title={issue.title}
-                  body={issue.body}
+                  {...issue}
                   url={issue.html_url}
                   repoUrl={issue.repo.html_url}
                   stars={issue.repo.stars}
                 />
               ))}
             </div>
-            <div className="flex items-center justify-center gap-4 mt-8 mb-8">
-              <PaginationButton onClick={handlePrevPage} disabled={page === 1}>
-                Previous
-              </PaginationButton>
 
-              <span className="text-gray-600 text-[14px]">
-                Page {page} of {totalPages}
-              </span>
-
-              <form
-                onSubmit={handleJumpToPage}
-                className="flex items-center gap-2"
-              >
-                <input
-                  type="number"
-                  min="1"
-                  max={totalPages}
-                  value={jumpToPage}
-                  onChange={(e) => setJumpToPage(e.target.value)}
-                  className="w-16 px-2 py-1 border rounded-md text-[14px]"
-                  placeholder="Page"
-                />
-                <button
-                  type="submit"
-                  className="px-2 py-1 border rounded-md text-[14px] bg-white hover:bg-gray-50 text-gray-700"
-                >
-                  Go
-                </button>
-              </form>
-
-              <PaginationButton
-                onClick={handleNextPage}
-                disabled={page === totalPages}
-              >
-                Next
-              </PaginationButton>
-            </div>
+            <PaginationControls
+              page={page}
+              totalPages={totalPages}
+              handlePrevPage={handlePrevPage}
+              handleNextPage={handleNextPage}
+              jumpToPage={jumpToPage}
+              setJumpToPage={setJumpToPage}
+              handleJumpToPage={handleJumpToPage}
+            />
           </>
         )}
       </main>
