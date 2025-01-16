@@ -1,6 +1,12 @@
 import Link from "next/link";
+import { IconButton } from "@mui/material";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import { useTheme } from "@/theme/ThemeContext";
 
 export default function Header() {
+  const { isDarkMode, toggleTheme } = useTheme();
+
   return (
     <>
       <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center mb-2 px-4 sm:px-0 gap-3 sm:gap-0">
@@ -23,6 +29,9 @@ export default function Header() {
         </div>
       </div>
       <hr className="my-4 mx-[-28px]" />
+      <IconButton onClick={toggleTheme} color="inherit">
+        {isDarkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+      </IconButton>
     </>
   );
 }

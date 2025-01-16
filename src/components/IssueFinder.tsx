@@ -44,7 +44,6 @@ export default function IssueFinder() {
   const topReposGFIs = async () => {
     const supabase = createClient();
 
-    // Try to get cached data from Supabase
     const { data: cachedData, error: fetchError } = await supabase
       .from("top_repos_issues")
       .select("*")
@@ -52,17 +51,14 @@ export default function IssueFinder() {
       .limit(1)
       .returns<TopReposIssuesRow[]>();
 
-    // If we have cached data that's less than 24 hours old, use it
     if (cachedData?.[0] && !fetchError) {
       const cacheAge =
         Date.now() - new Date(cachedData[0].created_at).getTime();
       if (cacheAge < 24 * 60 * 60 * 1000) {
-        // 24 hours
         return cachedData[0].data;
       }
     }
 
-    // If no cached data or it's too old, fetch from GitHub
     const response = await fetch("/api/issues/top-repos-gfis");
     const data = await response.json();
 
@@ -72,7 +68,6 @@ export default function IssueFinder() {
       throw new Error(data.message || "Failed to fetch issues");
     }
 
-    // Cache the new data in Supabase
     const { error: insertError } = await supabase
       .from("top_repos_issues")
       .insert({ data });
